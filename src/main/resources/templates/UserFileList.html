@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>用户文件列表页面</title>
+    <script th:src="@{/js/jquery-1.12.3.min.js}"></script>
+    <script>
+       $(function(){
+           setInterval(function(){
+               $.get("[[@{/file/findAllJSON}]]",function (res) {
+                   console.log(res);
+                   //遍历
+                   $.each(res,function (index,file) {
+                       $("#"+file.id).text(file.documents);
+                   })
+               });
+           },3000);
+
+       });
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.css">
+</head>
+<body>
+<h2>欢迎：<span th:if="${session.user!=null}"    th:text="${session.user.username}"></span></h2>
+<table class="ui celled table">
+    <thead>
+    <tr>
+        <th colspan="11">文件列表</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>ID</td>
+        <td>文件原始名称</td>
+        <td>文件新的名称</td>
+        <td>文件后缀</td>
+        <td>储存路径</td>
+        <td>文件大小</td>
+        <td>类型</td>
+        <td>是否图片</td>
+        <td>下载次数</td>
+        <td>上传时间</td>
+        <td>操作</td>
+    </tr>
+    <tr th:each="file,fileStat:${files}">
+        <td ><span th:text="${file.id}"></span></td>
+        <td ><span th:text="${file.oldFileName}"></span></td>
+        <td ><span th:text="${file.newFileName}"></span></td>
+        <td ><span th:text="${file.ext}"></span></td>
+        <td ><span th:text="${file.path}"></span></td>
+        <td ><span th:text="${file.size}"></span></td>
+        <td ><span th:text="${file.type}"></span></td>
+        <td >
+            <img  th:if="${file.isImg}=='yes'" style="width: 100px;height: 40px" th:src="${#servletContext.contextPath}+${file.path}+'/'+${file.newFileName}" alt="">
+            <span th:if="${file.isImg}!='yes'" th:text="${file.isImg}"></span>
+        </td>
+        <td th:id="${file.id}"><span th:text="${file.documents}"></span></td>
+        <td ><span th:text="${#dates.format(file.uploadTime,'yyyy-MM-dd HH:mm:ss')}"></span></td>
+        <td>
+            <a th:href="@{/file/download(id=${file.id})}">下载</a>
+            <a openStyle th:href="@{/file/download(id=${file.id},openStyle='inline')}">在线打开</a>
+            <a th:href="@{/file/delete(id=${file.id})}">删除</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<hr>
+<h3>上传文件</h3>
+<form  method="post" enctype="multipart/form-data" th:action="@{/file/upload}">
+    <input type="file" name="aaa"> <input type="submit" value="上传文件">
+</form>
+
+<div class="ui small compact negative message" ></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.js"></script>
+</body>
+</html>

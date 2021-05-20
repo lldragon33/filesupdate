@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>LoginPage</title>
+    <script th:src="@{/js/jquery-1.12.3.min.js}"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.css">
+</head>
+<body>
+<h1>Welcome to User-File-Manger-System !</h1>
+<!--<form th:action="@{/user/login}" method="post">-->
+<form id="loginForm">
+    username:<input type="text" name="username"/><br>
+    password:<input type="password" name ="password" id="password_input"/><br>
+<!--    <input type="submit" value="submit" id="submit_input"/>-->
+
+    <span id="errorSpan" style="display: none" >密码或用户名不正确！</span><br>
+    <button type="button" id="submit_input">登录</button>
+    <button><a href="Regist.html">注册</a></button>
+</form>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.js"></script>
+<script type="text/javascript">
+    //获取项目路径
+    function getContextPath(){
+        var curWwwPath = window.document.location.href;
+        var pathName = window.document.location.pathname;
+        var pathName = document.location.pathname;
+        var pos = curWwwPath.indexOf(pathName);
+        var localhostPaht = curWwwPath.substring(0, pos);
+
+
+        var index = pathName.substr(1).indexOf("/");
+        var result = pathName.substr(0,index+1);
+        return localhostPaht+result;
+    }
+
+    $("#password_input").click(function () {
+        document.getElementById("errorSpan").style.display='none';
+    });
+
+    $("#submit_input").click(function(){
+        //alert("success");
+        let contextPath = getContextPath();
+        $.ajax({
+            url:contextPath+"/user/login",
+            type:"POST",
+            data:$("#loginForm").serialize(),
+            success:function(result){
+                if(result=="success"){
+                    alert("登陆成功");
+                    window.location.href=contextPath+"/file/showAll";
+                }else{
+                    document.getElementById("errorSpan").style.display='block';
+                    $("#password_input").val("");
+
+                }
+            }
+        });
+    });
+
+
+
+</script>
+</body>
+</html>

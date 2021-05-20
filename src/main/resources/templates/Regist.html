@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Regist</title>
+
+    <script th:src="@{/js/jquery-1.12.3.min.js}"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.css">
+</head>
+<body>
+<h1>regist your account!</h1>
+<form id="registerForm">
+    username:<input type="text" name="username" id="username"/><br>
+    <span id="usernameSpan"  style="display: none">用户名已存在！</span><br>
+    password:<input type="password" name ="password" id="password"/><br>
+    confirmPassword:<input type="password" name ="confirmPassword" id="confirmPassword"/><br>
+    <span id="passwordSpan" style="display: none" >密码不一致！</span><br>
+    <button type="button" id="submit_button">submit</button>
+<!--    <input type="submit" value="submit" id="submit_button"/>-->
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.js"></script>
+<script type="text/javascript">
+    function getRootPath_web() {
+        //获取当前网址，如： http://localhost:8083/uimcardprj/share/meun.jsp
+        var curWwwPath = window.document.location.href;
+        //获取主机地址之后的目录，如： uimcardprj/share/meun.jsp
+        var pathName = window.document.location.pathname;
+        var pos = curWwwPath.indexOf(pathName);
+        //获取主机地址，如： http://localhost:8083
+        var localhostPaht = curWwwPath.substring(0, pos);
+        //获取带"/"的项目名，如：/uimcardprj
+        var projectName = pathName.substring(0, pathName.substr(1).indexOf('/') + 1);
+        // 打印获取当前项目根路径
+        console.log(getRootPath_web());
+        return (localhostPaht + projectName);
+    }
+
+    function getContextPath(){
+        var curWwwPath = window.document.location.href;
+        var pathName = window.document.location.pathname;
+        var pathName = document.location.pathname;
+        var pos = curWwwPath.indexOf(pathName);
+        var localhostPaht = curWwwPath.substring(0, pos);
+
+
+        var index = pathName.substr(1).indexOf("/");
+        var result = pathName.substr(0,index+1);
+        return localhostPaht+result;
+    }
+
+    $("#username").change(function(){
+        document.getElementById("usernameSpan").style.display='none';
+        var username = $("#username").val();
+       // alert(username);
+        let contextPath = getContextPath();
+        $.ajax({
+            url:contextPath+"/user/checkName",
+            type:"POST",
+            data:"username="+username,
+            success:function(result){
+                if(result=="exist"){
+                    document.getElementById("usernameSpan").style.display='block';
+                    //alert("用户名已存在！");
+                    $("#username").val("");
+
+                }
+            }
+
+        });
+    });
+
+    $("#submit_button").click(function(){
+
+        let contextPath = getContextPath();
+        let password = $("#password").val();
+        let username = $("#username").val();
+        var data = username+"-"+password;
+        alert(contextPath);
+        if($("#confirmPassword").val()==$("#password").val()){
+            $.ajax({
+                url:contextPath+"/user/register",
+                type:"POST",
+                data:$("#registerForm").serialize(),
+                success:function(result){
+                        alert("注册成功");
+                        window.location.href=contextPath+result;
+                }
+
+            });
+        }else{
+            //document.getElementById("passwordSpan").style.display='block';
+            alert("两次密码不一致！");
+            $("#username").val("");
+            $("#password").val("");
+            $("#confirmPassword").val("");
+            //document.getElementById("passwordSpan").style.display='none';
+        }
+    });
+</script>
+</body>
+</html>
